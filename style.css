@@ -259,10 +259,11 @@ dialog::backdrop {
 .save-btn {
     text-align: var(--brand-color);
     color: white;
+    background-color: #7a7fff;
 }
 
 .save-btn:hover {
-    background: #7a7fff;
+    background: rgb(221, 221, 247);
 }
 
 .empty-state {
