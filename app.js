@@ -1,5 +1,10 @@
 let notes = []
 
+function loadNotes() {
+    const savedNotes = localStorage.getItem('quicknotes')
+    return savedNotes ? JSON.parse(savedNotes) : []
+}
+
 function saveNote(event) {
     event.preventDefault() //prevents refresh of the page
 
@@ -14,6 +19,7 @@ function saveNote(event) {
     })
 
     saveNotes()
+    renderNotes()
 
 }
 
@@ -23,6 +29,30 @@ function generateId() {
 
 function saveNotes() {
     localStorage.setItem('quicknotes', JSON.stringify(notes))
+}
+
+function renderNotes() {
+    const notesContainer = document.querySelector('.notes-grid');
+    
+    if(notes.length === 0) {
+    //show some fall back elemments
+    notesContainer.innerHTML = `
+        <div class="empty-state">
+            <h2>No notes yet</h2>
+            <p>Create your first note to get started!</p>
+            <button class="add-note-btn" onclick="openNoteDialog()">+ Add Your First Note</button>
+        </div>
+    `
+    return
+    }
+
+    notesContainer.innerHTML = notes.map(note => `
+        <div class="note-card">
+            <h3 class="note-title">${note.title}</h3>
+            <p class="note-content">${note.content}</p>
+        </div>
+        `).join('')
+
 }
 
 function openNoteDialog() {
@@ -39,6 +69,8 @@ function closeNoteDialog() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    notes = loadNotes()
+    renderNotes()
     
     document.getElementById('noteForm').addEventListener('submit', saveNote)
 
