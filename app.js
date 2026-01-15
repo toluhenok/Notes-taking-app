@@ -1,4 +1,5 @@
-let notes = []
+let notes = [];
+let editingNoteId = null;
 
 function loadNotes() {
     const savedNotes = localStorage.getItem('quicknotes')
@@ -6,21 +7,32 @@ function loadNotes() {
 }
 
 function saveNote(event) {
-    event.preventDefault() //prevents refresh of the page
+    event.preventDefault(); //prevents refresh of the page
 
     const title = document.getElementById('noteTitle').value.trim();
     const content = document.getElementById('noteContent').value.trim();
 
-    //unshift adds new value to the beginning of the array
-    notes.unshift({
-        id: generateId(),
-        title: title,
-        content: content
-    })
+    if (editingNoteId) {
+        // update existing note
+        const note = notes.find(n => n.id === editingNoteId);
+        if (note) {
+            note.title = title;
+            note.content = content;
+        }
 
-    saveNotes()
-    renderNotes()
-
+    } else {
+        // create new note
+        notes.unshift ({
+            id: generateId(),
+            title: title,
+            content: content
+        });
+    
+    }
+    editingNoteId = null;
+    saveNotes();
+    renderNotes();
+    closeNoteDialog();
 }
 
 function generateId() {
@@ -70,10 +82,12 @@ function renderNotes() {
 
 }
 
-function openNoteDialog(noteId) {
+function openNoteDialog(noteId = null) {
     const dialog = document.getElementById('noteDialog');
     const titleInput = document.getElementById('noteTitle');
     const contentInput = document.getElementById('noteContent');
+
+    editingNoteId = noteId;
 
     if (noteId) {
         const note = notes.find(n => n.id === noteId);
@@ -91,7 +105,8 @@ function openNoteDialog(noteId) {
 }
 
 function closeNoteDialog() {
-    document.getElementById('noteDialog').close()
+    editingNoteId = null;
+    document.getElementById('noteDialog').close();
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -105,6 +120,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if(event.target === this) {
             closeNoteDialog()
         }
-    })
+    });
+
+    //dark theme toggle
+    document.getElementById('themeToggleBtn').addEventListener('click', function() {
+        document.body.classList.toggle('dark-theme');
+        this.textContent = document.body.classList.contains('dark-theme') ? '☀️' : '🌙';
+    });
 })
 
